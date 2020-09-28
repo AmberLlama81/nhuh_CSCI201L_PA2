@@ -220,10 +220,14 @@ public class Dictionary<AnyType extends Comparable<AnyType>>  implements Diction
 	@SuppressWarnings("unchecked")
 	public static int frequency(Comparable[] a, Comparable item) {
 		int cnt = 0;
+		int firstOccur;
 		
-		for (Comparable v1: a) {
-			if (a.equals(item)) {
+		firstOccur = binarySearch(a, item);
+		
+		if (firstOccur != -1) {
+			while (a[firstOccur].equals(item)) {
 				cnt++;
+				firstOccur++;
 			}
 		}
 		
@@ -295,7 +299,7 @@ public class Dictionary<AnyType extends Comparable<AnyType>>  implements Diction
 
 		java.util.Queue<Comparable[]> q = new java.util.LinkedList<Comparable[]>();
 
-		throw newsadfjalsdfal;dfj
+		
 
 		return q;
 	}
