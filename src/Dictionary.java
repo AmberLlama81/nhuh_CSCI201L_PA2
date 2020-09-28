@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 /**
  ******************************************************************************
  *                    HOMAnyTypeWORK-2, cs201
@@ -57,8 +59,6 @@ public class Dictionary<AnyType extends Comparable<AnyType>>  implements Diction
 		if(e == null) {
 			return;
 		}
-
-		Comparable[] addition = new Comparable[]();
 		
 		size++;
 
@@ -78,6 +78,7 @@ public class Dictionary<AnyType extends Comparable<AnyType>>  implements Diction
 		if (contains(e)) {
 			size--;
 		}
+		
 		/*
 		 * Your code goes here...
 		 */
@@ -93,11 +94,11 @@ public class Dictionary<AnyType extends Comparable<AnyType>>  implements Diction
 			return false;
 		}
 
-		/*
-		 * Your code goes here...
-		 */
-
-		throw new RuntimeAnyTypexception("You need to implement this method!");
+		if (frequency(e) == 0) {
+			return false;
+		}
+		
+		return true;
 	}
 
 	/**
@@ -110,11 +111,14 @@ public class Dictionary<AnyType extends Comparable<AnyType>>  implements Diction
 			return 0;
 		}
 
-		/*
-		 * Your code goes here...
-		 */
+		Node tmp = head;
+		int freq = 0;
+		while (tmp != null) {
+			freq += frequency(tmp.array, e);
+			tmp = tmp.next;
+		}
 
-		throw new RuntimeAnyTypexception("You need to implement this method!");
+		return freq;
 	}
 
 	/**
@@ -132,7 +136,7 @@ public class Dictionary<AnyType extends Comparable<AnyType>>  implements Diction
 	 * 		-the resulting frequency of any item is the sum of its frequency in the two dictionaries
 	 * 		-the resulting size is the sum of the two sizes
 	 */
-	public void combine(Dictionary<AnyType> other) {
+	public void combine (Dictionary<AnyType> other) {
 		if (other == null || this == other) {
 			return;
 		}
@@ -149,13 +153,14 @@ public class Dictionary<AnyType extends Comparable<AnyType>>  implements Diction
 	 */
 	public String toString() {
 		Node tmp = head;
-		String result = "";
+		StringBuffer result = new StringBuffer();
 		while (tmp.next != null) {
 			for (Comparable<AnyType> v1: tmp.array) {
-				
+				result.append(v1.toString());
+				result.append(", ");
 			}
 		}
-		return result;
+		return result.toString();
 	}
 
 
@@ -166,11 +171,14 @@ public class Dictionary<AnyType extends Comparable<AnyType>>  implements Diction
 	 * This is very useful for implementing add(e)!!!  See the lecture notes for the theory behind this.
 	 */
 	private void mergeDown() {
-		/*
-		 * Your code goes here...
-		 */
-
-		throw new RuntimeAnyTypexception("You need to implement this method!");
+		Node tmp = head;
+		while (tmp.next != null) {
+			if (tmp.array.length == tmp.next.array.length) {
+				merge(tmp.array, tmp.next.array);
+				tmp.next = tmp.next.next;
+			}
+			tmp = tmp.next;
+		}
 	}
 
 	/**
@@ -185,11 +193,19 @@ public class Dictionary<AnyType extends Comparable<AnyType>>  implements Diction
 	 */
 	@SuppressWarnings("unchecked")
 	public static int binarySearch(Comparable[] a, Comparable item) {
-		/*
-		 * Your code goes here...
-		 */
-
-		throw new RuntimeAnyTypexception("You need to implement this method!");
+		int l = 0;
+		int r = a.length - 1;
+		while (l <= r) {
+			int m = (l + r) / 2;
+			if (a[m].compareTo(item) < 0) {
+				l = m;
+			} else if (a[m].compareTo(item) > 0) {
+				r = m;
+			} else {
+				return m;
+			}
+		}
+		return -1;
 	}
 
 	/**
@@ -203,11 +219,15 @@ public class Dictionary<AnyType extends Comparable<AnyType>>  implements Diction
 	 */
 	@SuppressWarnings("unchecked")
 	public static int frequency(Comparable[] a, Comparable item) {
-		/*
-		 * Your code goes here...
-		 */
-
-		throw new RuntimeAnyTypexception("You need to implement this method!");
+		int cnt = 0;
+		
+		for (Comparable v1: a) {
+			if (a.equals(item)) {
+				cnt++;
+			}
+		}
+		
+		return cnt;
 	}
 
 	/**
@@ -221,11 +241,30 @@ public class Dictionary<AnyType extends Comparable<AnyType>>  implements Diction
 	 */
 	@SuppressWarnings("unchecked")
 	public static Comparable[] merge(Comparable[] a, Comparable[] b) {
-		/*
-		 * Your code goes here...
-		 */
-
-		throw new RuntimeAnyTypexception("You need to implement this method!");
+		int i = 0; 
+		int j = 0;
+		ArrayList<Comparable> result = new ArrayList<Comparable>();
+		while (i < a.length && j < b.length) {
+			if (a[i].compareTo(b[j]) < 0) {
+				result.add(a[i]);
+				i++;
+			} else {
+				result.add(b[j]);
+				j++;
+			}
+		}
+		
+		while (i < a.length) {
+			result.add(a[i]);
+			i++;
+		}
+		
+		while (j < b.length) {
+			result.add(b[j]);
+			j++;
+		}
+		
+		return (Comparable[]) result.toArray();
 	}
 
 	/**
@@ -256,11 +295,9 @@ public class Dictionary<AnyType extends Comparable<AnyType>>  implements Diction
 
 		java.util.Queue<Comparable[]> q = new java.util.LinkedList<Comparable[]>();
 
-		/*
-		 * Your code goes here...
-		 */
+		throw newsadfjalsdfal;dfj
 
-		throw new RuntimeAnyTypexception("You need to implement this method!");
+		return q;
 	}
 
 	/**
