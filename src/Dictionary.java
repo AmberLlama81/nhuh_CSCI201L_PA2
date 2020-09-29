@@ -60,9 +60,12 @@ public class Dictionary<AnyType extends Comparable<AnyType>>  implements Diction
 			return;
 		}
 		
+		Comparable[] tmpArray = {e};
+		Node addition = new Node(1, tmpArray, head);
+		head = addition;
+		mergeDown();
+		
 		size++;
-
-		throw new RuntimeAnyTypexception("You need to implement this method!");
 	}
 
 	/**
