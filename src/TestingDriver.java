@@ -67,8 +67,10 @@ public class TestingDriver {
 			d.add(1);
 			d.add(2);
 			d.add(3);
+			d.add(4);
 			d.remove(1);
-			if(!d.toString().equals("1: [2, 3]\n")) {
+			d.remove(3);
+			if(!d.toString().equals("1: [2, 4]\n")) {
 				throw new Exception();
 			}
 		}
@@ -123,6 +125,7 @@ public class TestingDriver {
 			Dictionary<Integer> d = new Dictionary<Integer>();
 			for(int n = 1; n <= 100; n++) {
 				if(d.size() != n-1) {
+					System.out.println(d.size() + " != " + (n-1));
 					throw new Exception();
 				}
 				d.add(n);
@@ -130,6 +133,7 @@ public class TestingDriver {
 		}
 		catch(Exception e) {
 			throw new RuntimeException("Your size() definitely isn't working.");
+			
 		}
 	}
 
@@ -169,7 +173,7 @@ public class TestingDriver {
 		} catch (ClassNotFoundException e1) {
 			System.out.println("Something is wrong with your computer ... TestingDriver.java cannot be accessed.");
 		}
-
+		
 		for(java.lang.reflect.Method m : c.getDeclaredMethods()) {
 			if(m.getName().indexOf("Test") == -1) {
 				continue;

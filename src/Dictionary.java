@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  ******************************************************************************
@@ -61,10 +62,9 @@ public class Dictionary<AnyType extends Comparable<AnyType>>  implements Diction
 		}
 		
 		Comparable[] tmpArray = {e};
-		Node addition = new Node(1, tmpArray, head);
+		Node addition = new Node(0, tmpArray, head);
 		head = addition;
 		mergeDown();
-		
 		size++;
 	}
 
@@ -78,15 +78,96 @@ public class Dictionary<AnyType extends Comparable<AnyType>>  implements Diction
 			return;
 		}
 
-		if (contains(e)) {
-			size--;
+		if (!contains(e)) {
+			return;
 		}
 		
-		/*
-		 * Your code goes here...
-		 */
-
-		throw new RuntimeAnyTypexception("You need to implement this method!");
+		size--;
+		
+		int headSearch = binarySearch(head.array, e);
+		if (headSearch != -1) {
+			int headPower = head.power;
+			ArrayList<Comparable> tmpList = new ArrayList<Comparable>();
+			for (Comparable v1: head.array) {
+				tmpList.add(v1);
+			}
+			tmpList.remove(e);
+			
+			java.util.Queue<Comparable[]> tmpQueue = splitUp(tmpList.toArray(new Comparable[tmpList.size()]), headPower);
+			
+			if (tmpQueue.size() == 0) {
+				if (head.next != null) {
+					head = head.next;
+				} else {
+					head = null;
+				}
+				return;
+			}
+			
+			head = head.next;
+			for (Comparable[] v1: tmpQueue) {
+				int cnt = 0;
+				int powerCnt = v1.length;
+				while (powerCnt != 1) {
+					cnt++;
+					powerCnt /= 2;
+				}
+				Node newNode = new Node(cnt, v1, head);
+				head = newNode;
+			}
+			mergeDown();
+		} else {
+			Node tmpNode = head.next;
+			while (binarySearch(tmpNode.array, e) == -1) {
+				tmpNode = tmpNode.next;
+			}
+			
+			ArrayList<Comparable> tmpList = new ArrayList<Comparable>();
+			for (Comparable v1: tmpNode.array) {
+				tmpList.add(v1);
+			}
+			tmpList.remove(e);
+			Comparable tmpVar = head.array[head.array.length - 1];
+			int size = tmpList.size();
+			boolean inserted = false;
+			int i = 0;
+			
+			while (!inserted) {
+				if (tmpList.get(i).compareTo(tmpVar) >= 0 || i >= size - 1) {
+					tmpList.add(i, tmpVar);
+					inserted = true;
+				} else {
+					i++;
+				}
+			}
+			
+			java.util.Queue<Comparable[]> tmpQueue = splitUp(head.array, head.power);
+			
+			tmpNode.array = tmpList.toArray(new Comparable[tmpList.size()]);
+			
+			if (tmpQueue.size() == 0) {
+				if (head.next != null) {
+					head = head.next;
+				} else {
+					head = null;
+				}
+				return;
+			} 
+			
+			
+			head = head.next;
+			for (Comparable[] v1: tmpQueue) {
+				int cnt = 0;
+				int powerCnt = v1.length;
+				while (powerCnt != 1) {
+					cnt++;
+					powerCnt /= 2;
+				}
+				Node newNode = new Node(cnt, v1, head);
+				head = newNode;
+			}
+			mergeDown();
+		}
 	}
 
 	/**
@@ -143,12 +224,23 @@ public class Dictionary<AnyType extends Comparable<AnyType>>  implements Diction
 		if (other == null || this == other) {
 			return;
 		}
-
-		/*
-		 * Your code goes here...
-		 */
-
-		throw new RuntimeAnyTypexception("You need to implement this method!");
+		
+		Node tmpOthNode = other.head;
+		while (tmpOthNode != null) {
+			Node newNode = new Node(tmpOthNode.power, tmpOthNode.array, null);
+			Node tmpNode = head;
+			while (tmpNode.power < newNode.power) {
+				tmpNode = tmpNode.next;
+			}
+			
+			newNode.next = tmpNode.next;
+			tmpNode.next = newNode;
+			size += newNode.array.length;
+			
+			tmpOthNode = tmpOthNode.next;
+		}
+		
+		mergeDown();
 	}
 
 	/**
@@ -157,11 +249,12 @@ public class Dictionary<AnyType extends Comparable<AnyType>>  implements Diction
 	public String toString() {
 		Node tmp = head;
 		StringBuffer result = new StringBuffer();
-		while (tmp.next != null) {
-			for (Comparable<AnyType> v1: tmp.array) {
-				result.append(v1.toString());
-				result.append(", ");
-			}
+		while (tmp != null) {
+			result.append(tmp.power);
+			result.append(": ");
+			result.append(Arrays.toString(tmp.array));
+			result.append("\n");
+			tmp = tmp.next;
 		}
 		return result.toString();
 	}
@@ -174,13 +267,27 @@ public class Dictionary<AnyType extends Comparable<AnyType>>  implements Diction
 	 * This is very useful for implementing add(e)!!!  See the lecture notes for the theory behind this.
 	 */
 	private void mergeDown() {
-		Node tmp = head;
-		while (tmp.next != null) {
-			if (tmp.array.length == tmp.next.array.length) {
-				merge(tmp.array, tmp.next.array);
-				tmp.next = tmp.next.next;
+		mergeDownHelp(head);
+	}
+	
+	private void mergeDownHelp(Node n1) {
+		Node tmp = n1;
+		if (tmp == null || tmp.next == null) {
+			return;
+		} 
+		
+		if (tmp.array.length == tmp.next.array.length) {
+			tmp.array = merge(tmp.array, tmp.next.array);
+			tmp.next = tmp.next.next;
+			tmp.power++;
+			
+			if (tmp.next != null && tmp.next.next != null && tmp.next.array.length == tmp.next.next.array.length) {
+				mergeDownHelp(tmp.next);
+			} else {
+				mergeDownHelp(tmp);
 			}
-			tmp = tmp.next;
+		} else {
+			mergeDownHelp(tmp.next);
 		}
 	}
 
@@ -200,10 +307,20 @@ public class Dictionary<AnyType extends Comparable<AnyType>>  implements Diction
 		int r = a.length - 1;
 		while (l <= r) {
 			int m = (l + r) / 2;
-			if (a[m].compareTo(item) < 0) {
-				l = m;
+			if (l == r && a[m].compareTo(item) != 0) {
+				return -1;
+			} else if (a[m].compareTo(item) < 0) {
+				if (l == m) {
+					l++;
+				} else {
+					l = m;
+				}
 			} else if (a[m].compareTo(item) > 0) {
-				r = m;
+				if (r == m) {
+					r--;
+				} else {
+					r = m;
+				}
 			} else {
 				return m;
 			}
@@ -228,7 +345,13 @@ public class Dictionary<AnyType extends Comparable<AnyType>>  implements Diction
 		firstOccur = binarySearch(a, item);
 		
 		if (firstOccur != -1) {
-			while (a[firstOccur].equals(item)) {
+			int tmpInt = firstOccur - 1;
+			while (tmpInt >= 0 && a[tmpInt].equals(item)) {
+				cnt++;
+				tmpInt--;
+			}
+			
+			while (firstOccur < a.length && a[firstOccur].equals(item)) {
 				cnt++;
 				firstOccur++;
 			}
@@ -271,7 +394,8 @@ public class Dictionary<AnyType extends Comparable<AnyType>>  implements Diction
 			j++;
 		}
 		
-		return (Comparable[]) result.toArray();
+		Comparable[] tmpArray = new Comparable[result.size()];
+		return result.toArray(tmpArray);
 	}
 
 	/**
@@ -281,6 +405,14 @@ public class Dictionary<AnyType extends Comparable<AnyType>>  implements Diction
 		return (int) (Math.pow(base, exponent));
 	}
 
+	
+	private static int indexHelper(int k) {
+		int result = 0;
+		for (int i = k - 1; i >= 0; i--) {
+			result += power(2, i);
+		}
+		return result;
+	}
 	/**
 	 * Assumes a.length >= 2^k - 1, for the given k.
 	 *
@@ -302,7 +434,21 @@ public class Dictionary<AnyType extends Comparable<AnyType>>  implements Diction
 
 		java.util.Queue<Comparable[]> q = new java.util.LinkedList<Comparable[]>();
 
-		
+		for (int i = k - 1; i >= 0; i--) {
+			ArrayList<Comparable> tmpList = new ArrayList<Comparable>();
+			int floorNum;
+			if (i == 0) {
+				floorNum = 0;
+			} else {
+				floorNum = indexHelper(i);
+			}
+			
+			for (int j = 0; j < power(2, i); j++) {
+				tmpList.add(a[j + floorNum]);
+			}
+			
+			q.add(tmpList.toArray(new Comparable[tmpList.size()]));
+		}
 
 		return q;
 	}
